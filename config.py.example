@@ -1,1 +1,3 @@
-server_url = 'http://example.org'
+SERVER_URL = 'http://example.org'
+PERSONA_USER = 'email address goes here'
+PERSONA_PASS = 'password goes here'
