@@ -35,6 +35,8 @@ class MicrowebIntegration(unittest.TestCase):
 
         self.create_comment_on_item('conversations', conversation_id)
 
+        event_id = self.create_event(microcosm_id)
+
     def login(self):
         """
         Login with Mozilla Persona and assert that the default profile name is correct.
@@ -192,9 +194,35 @@ class MicrowebIntegration(unittest.TestCase):
 
         assert old_title + ' edited' == edited_title.text
 
+    def create_event(self, microcosm_id):
+        self.selenium.get(self.live_server_url + '/microcosms/' + str(microcosm_id))
+
+        # Click through to item creation page
+        WebDriverWait(self.selenium, 5).until(
+            EC.element_to_be_clickable((By.ID, 'create_item'))).click()
+
+        # Click to load event creation form
+        WebDriverWait(self.selenium, 5).until(
+            EC.element_to_be_clickable((By.ID, 'create_event'))).click()
+
+        title = WebDriverWait(self.selenium, 5).until(
+            EC.element_to_be_clickable((By.ID, 'id_title')))
+        title.send_keys('Selenium test event')
+
+        where = WebDriverWait(self.selenium, 5).until(
+            EC.element_to_be_clickable((By.ID, 'id_where')))
+        where.send_keys('London, UK')
+
+        # Click 'locate' to geolocate on the map
+        WebDriverWait(self.selenium, 5).until(
+            EC.element_to_be_clickable((By.ID, 'locate'))).click()
+
+        WebDriverWait(self.selenium, 5).until(
+            EC.element_to_be_clickable((By.ID, 'submit'))).click()
+
     def create_comment_on_item(self, item_path, item_id):
 
-        item_url = self.live_server_url + '/' + item_path + '/' + str(item_id)
+        item_url = self.live_server_url + '/' + item_path + '/' + str(item_id) + '/'
         self.selenium.get(item_url)
 
         markdown = 'A test comment with *markdown*\n \
@@ -204,12 +232,6 @@ class MicrowebIntegration(unittest.TestCase):
             EC.element_to_be_clickable((By.ID, 'id_markdown')))
         comment_box.send_keys(markdown)
         self.selenium.find_element_by_id('submit_comment').click()
-
-        # Check that we've been redirected to the item page
-        # TODO: this will break if there are any URL parameters
-        assert item_url == self.selenium.current_url
-
-        #TODO: return the comment ID from the article fragment.
 
     def edit_comment(self, comment_id):
         self.selenium.get(self.live_server_url + '/comments/' + str(comment_id))
