@@ -38,17 +38,63 @@ class CommonActions():
         webdriver.switch_to_window('')
 
         # Wait until profile name is clickable
-        profile_name = WebDriverWait(webdriver, 10).until(
+        WebDriverWait(webdriver, 10).until(
             EC.element_to_be_clickable((By.ID, 'profile_name')))
 
     @staticmethod
     def logout(server_url, webdriver):
 
         webdriver.get(server_url)
-        WebDriverWait(webdriver, 5).until(
+        WebDriverWait(webdriver, 10).until(
             EC.element_to_be_clickable((By.ID, 'logout'))).click()
         WebDriverWait(webdriver, 5).until(
             EC.element_to_be_clickable((By.ID, 'home'))).click()
+
+    @staticmethod
+    def create_microcosm(server_url, webdriver, title, description):
+        """
+        Prerequisite: must be viewing a site and have create permission.
+        """
+
+        webdriver.get(server_url)
+
+        create_microcosm = WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.ID, 'create_microcosm')))
+        create_microcosm.click()
+
+        WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.ID, 'id_title'))).send_keys(title)
+
+        WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.ID, 'id_description'))).send_keys(description)
+
+        webdriver.find_element_by_id('submit').click()
+
+        WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.ID, 'microcosm_title')))
+
+    @staticmethod
+    def create_conversation(webdriver, title):
+        """
+        Prerequisite: must be viewing a microcosm and have create permission.
+        """
+
+        # Click through to item creation page
+        WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.ID, 'create_item'))).click()
+
+        # Click through to create conversation form
+        WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.ID, 'create_conversation'))).click()
+
+        WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.ID, 'id_title'))).send_keys(title)
+
+        WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.ID, 'submit'))).click()
+
+        WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.ID, 'conversation_title')))
 
 
 class LoginIntegration(unittest.TestCase):
@@ -72,7 +118,7 @@ class LoginIntegration(unittest.TestCase):
         WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'profile_name'))).click()
 
-        profile_name = WebDriverWait(self.selenium, 10).until(
+        WebDriverWait(self.selenium, 10).until(
             EC.element_to_be_clickable((By.ID, 'profile_name')))
 
     def test_edit_profile_name(self):
@@ -88,7 +134,7 @@ class LoginIntegration(unittest.TestCase):
         WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'submit'))).click()
 
-        profile_name = WebDriverWait(self.selenium, 5).until(
+        profile_name = WebDriverWait(self.selenium, 10).until(
             EC.element_to_be_clickable((By.ID, 'profile_name')))
         assert profile_name.text.endswith('_edit')
 
@@ -99,34 +145,47 @@ class LoginIntegration(unittest.TestCase):
 
         assert len(self.selenium.find_elements_by_id('login_link')) > 0
 
-    def create_microcosm(self):
-        self.selenium.get(self.live_server_url)
 
-        create_microcosm = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'create_microcosm')))
-        create_microcosm.click()
+class MicrocosmIntegration(unittest.TestCase):
 
-        title = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_title')))
-        title.send_keys('Test microcosm')
+    def setUp(self):
+        self.selenium = webdriver.Firefox()
+        self.live_server_url = config.SERVER_URL
+        CommonActions.login(self.live_server_url, self.selenium)
 
-        description = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_description')))
-        description.send_keys('Created by selenium')
+    def tearDown(self):
+        self.selenium.close()
 
-        self.selenium.find_element_by_id('submit').click()
+    def test_create_microcosm(self):
 
+        title = 'Test microcosm'
+        description = 'Created by selenium'
+        CommonActions.create_microcosm(
+            self.live_server_url,
+            self.selenium,
+            title,
+            description
+        )
+
+        # Depends on being directed to the newly created microcosm
         microcosm_title = WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'microcosm_title')))
-        assert microcosm_title.text == 'Test microcosm'
+        assert microcosm_title.text == title
 
         microcosm_desc = self.selenium.find_element_by_id('microcosm_description')
-        assert microcosm_desc.text == 'Created by selenium'
+        assert microcosm_desc.text == description
 
-        return self.selenium.current_url.split('/')[-2]
+    def test_edit_microcosm(self):
 
-    def edit_microcosm(self, microcosm_id):
-        self.selenium.get(self.live_server_url + '/microcosms/' + str(microcosm_id))
+        title = 'Test microcosm'
+        description = 'Created by selenium'
+        CommonActions.create_microcosm(
+            self.live_server_url,
+            self.selenium,
+            title,
+            description
+        )
+
         WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'edit_microcosm'))).click()
 
@@ -143,62 +202,52 @@ class LoginIntegration(unittest.TestCase):
 
         title = WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'microcosm_title')))
-        assert 'Test microcosm edited' == title.text
+        assert title.text.endswith('edited')
 
-    def view_profile(self):
-        self.selenium.get(self.live_server_url)
-        WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'profile_name'))).click()
 
-        profile_name = WebDriverWait(self.selenium, 10).until(
-            EC.element_to_be_clickable((By.ID, 'profile_name')))
-        assert profile_name.text == config.PERSONA_USER.split('@')[0]
+class ConversationIntegration(unittest.TestCase):
 
-    def edit_profile(self):
-        self.selenium.get(self.live_server_url)
-        WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'edit_profile'))).click()
+    def setUp(self):
+        self.selenium = webdriver.Firefox()
+        self.live_server_url = config.SERVER_URL
+        CommonActions.login(self.live_server_url, self.selenium)
 
-        edit_reason = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_profileName')))
-        edit_reason.send_keys('_edited')
+    def tearDown(self):
+        self.selenium.close()
 
-        WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'submit'))).click()
+    def test_create_conversation(self):
+        CommonActions.create_microcosm(
+            self.live_server_url,
+            self.selenium,
+            'Microcosm for test conversation',
+            'Just a test'
+        )
 
-        profile_name = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'profile_name')))
-        assert profile_name.text == 'personauser_edited'
+        conversation_title = 'Conversation test'
 
-    def create_conversation(self, microcosm_id):
-        # Single microcosm view
-        self.selenium.get(self.live_server_url + '/microcosms/' + str(microcosm_id))
-
-        # Click through to item creation page
-        WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'create_item'))).click()
-
-        # Click to load event creation form
-        WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'create_conversation'))).click()
-
-        WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_title'))).send_keys('Conversation test')
-
-        WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'submit'))).click()
+        CommonActions.create_conversation(
+            self.selenium,
+            conversation_title
+        )
 
         title = WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'conversation_title')))
-        assert title.text == 'Conversation test'
+        assert title.text == conversation_title
 
-        return self.selenium.current_url.split('/')[-2]
+    def test_edit_conversation(self):
+        CommonActions.create_microcosm(
+            self.live_server_url,
+            self.selenium,
+            'Microcosm for edited test conversation',
+            'Just a test'
+        )
 
-    def edit_conversation(self, conversation_id):
-        self.selenium.get(self.live_server_url + '/conversations/' + str(conversation_id))
+        conversation_title = 'Conversation test'
 
-        old_title = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'conversation_title'))).text
+        CommonActions.create_conversation(
+            self.selenium,
+            conversation_title
+        )
 
         WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'edit_conversation'))).click()
@@ -217,7 +266,10 @@ class LoginIntegration(unittest.TestCase):
         edited_title = WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'conversation_title')))
 
-        assert old_title + ' edited' == edited_title.text
+        assert edited_title.text.endswith('edited')
+
+
+class EventIntegration(unittest.TestCase):
 
     def create_event(self, microcosm_id):
         self.selenium.get(self.live_server_url + '/microcosms/' + str(microcosm_id))
@@ -244,6 +296,9 @@ class LoginIntegration(unittest.TestCase):
 
         WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'submit'))).click()
+
+
+class CommentIntegration(unittest.TestCase):
 
     def create_comment_on_item(self, item_path, item_id):
 
