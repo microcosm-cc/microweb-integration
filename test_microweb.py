@@ -9,7 +9,50 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
 
-class MicrowebIntegration(unittest.TestCase):
+class CommonActions():
+    """
+    A set of common actions (e.g. logging in) which are composed within
+    individual tests.
+    """
+
+    @staticmethod
+    def login(server_url, webdriver):
+
+        webdriver.get(server_url)
+
+        # Click login link, switch to persona window
+        webdriver.find_element_by_id('login_link').click()
+        webdriver.switch_to_window('__persona_dialog')
+
+        # Enter email address and password
+        email_address_input = WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.XPATH, '//*[@id="authentication_email"]')))
+        email_address_input.send_keys(config.PERSONA_USER)
+        webdriver.find_element_by_xpath('//*[@id="authentication_form"]/p[3]/button[1]').click()
+
+        password_input = WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.XPATH, '//*[@id="authentication_password"]')))
+        password_input.send_keys(config.PERSONA_PASS)
+
+        # Submit login form and switch back to previous window
+        webdriver.find_element_by_xpath('//*[@id="authentication_form"]/p[3]/button[2]').click()
+        webdriver.switch_to_window('')
+
+        # Wait until profile name is clickable
+        profile_name = WebDriverWait(webdriver, 10).until(
+            EC.element_to_be_clickable((By.ID, 'profile_name')))
+
+    @staticmethod
+    def logout(server_url, webdriver):
+
+        webdriver.get(server_url)
+        WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.ID, 'logout'))).click()
+        WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.ID, 'home'))).click()
+
+
+class LoginIntegration(unittest.TestCase):
 
     def setUp(self):
         self.selenium = webdriver.Firefox()
@@ -18,61 +61,44 @@ class MicrowebIntegration(unittest.TestCase):
     def tearDown(self):
         self.selenium.close()
 
-    def test_all(self):
-        """
-        Run integration tests in a specific sequence, since we do not (yet) have test fixtures.
-        """
+    def test_login(self):
+        
+        CommonActions.login(self.live_server_url, self.selenium)
+        assert self.selenium.find_element_by_id('profile_name').text != ""
 
-        self.login()
-        self.view_profile()
-        self.edit_profile()
+    def test_view_profile(self):
 
-        microcosm_id = self.create_microcosm()
-        self.edit_microcosm(microcosm_id)
+        CommonActions.login(self.live_server_url, self.selenium)
 
-        conversation_id = self.create_conversation(microcosm_id)
-        self.edit_conversation(conversation_id)
+        WebDriverWait(self.selenium, 5).until(
+            EC.element_to_be_clickable((By.ID, 'profile_name'))).click()
 
-        self.create_comment_on_item('conversations', conversation_id)
-
-        event_id = self.create_event(microcosm_id)
-
-    def login(self):
-        """
-        Login with Mozilla Persona and assert that the default profile name is correct.
-        """
-
-        # Login with persona
-        self.selenium.get(self.live_server_url)
-
-        # Click 'login' and switch to persona window
-        self.selenium.find_element_by_id('login_link').click()
-        self.selenium.switch_to_window('__persona_dialog')
-
-        # Enter email address and password
-        # EC.element_to_be_visible was originally used here,
-        # but did not seem to wait for the element to be active
-        email_address_input = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.XPATH, '//*[@id="authentication_email"]')))
-        email_address_input.send_keys(config.PERSONA_USER)
-        self.selenium.find_element_by_xpath('//*[@id="authentication_form"]/p[3]/button[1]').click()
-
-        password_input = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.XPATH, '//*[@id="authentication_password"]')))
-        password_input.send_keys(config.PERSONA_PASS)
-
-        # Submit login form and switch back to previous window
-        self.selenium.find_element_by_xpath('//*[@id="authentication_form"]/p[3]/button[2]').click()
-        self.selenium.switch_to_window('')
-
-        # Persona login form will be submitted and page reloaded,
-        # so wait until profile name is clickable
         profile_name = WebDriverWait(self.selenium, 10).until(
             EC.element_to_be_clickable((By.ID, 'profile_name')))
 
-        # By default profile_name will be set to the
-        # local part (before the '@') of the email address
-        assert profile_name.text == config.PERSONA_USER.split('@')[0]
+    def test_edit_profile_name(self):
+
+        CommonActions.login(self.live_server_url, self.selenium)
+
+        WebDriverWait(self.selenium, 5).until(
+            EC.element_to_be_clickable((By.ID, 'profile_name'))).click()
+
+        WebDriverWait(self.selenium, 5).until(
+            EC.element_to_be_clickable((By.ID, 'id_profileName'))).send_keys('_edit')
+
+        WebDriverWait(self.selenium, 5).until(
+            EC.element_to_be_clickable((By.ID, 'submit'))).click()
+
+        profile_name = WebDriverWait(self.selenium, 5).until(
+            EC.element_to_be_clickable((By.ID, 'profile_name')))
+        assert profile_name.text.endswith('_edit')
+
+    def test_logout(self):
+
+        CommonActions.login(self.live_server_url, self.selenium)
+        CommonActions.logout(self.live_server_url, self.selenium)
+
+        assert len(self.selenium.find_elements_by_id('login_link')) > 0
 
     def create_microcosm(self):
         self.selenium.get(self.live_server_url)
@@ -240,6 +266,7 @@ class MicrowebIntegration(unittest.TestCase):
             EC.element_to_be_clickable((By.ID, 'id_markdown')))
         comment_box.send_keys(' edited')
         self.selenium.find_element_by_id('submit_comment').click()
+
 
 if __name__ == "__main__":
     unittest.main()
