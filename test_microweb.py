@@ -96,6 +96,33 @@ class CommonActions():
         WebDriverWait(webdriver, 5).until(
             EC.element_to_be_clickable((By.ID, 'conversation_title')))
 
+    @staticmethod
+    def create_event(webdriver, title, location_string):
+        """
+        Prerequisite: must be viewing a microcosm and have create permission.
+        """
+
+        # Click through to item creation page
+        WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.ID, 'create_item'))).click()
+
+        # Click to load event creation form
+        WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.ID, 'create_event'))).click()
+
+        WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.ID, 'id_title'))).send_keys(title)
+
+        WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.ID, 'id_where'))).send_keys(location_string)
+
+        # Click 'locate' to geolocate on the map
+        WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.ID, 'locate'))).click()
+
+        WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.ID, 'submit'))).click()
+
 
 class LoginIntegration(unittest.TestCase):
 
@@ -271,31 +298,70 @@ class ConversationIntegration(unittest.TestCase):
 
 class EventIntegration(unittest.TestCase):
 
-    def create_event(self, microcosm_id):
-        self.selenium.get(self.live_server_url + '/microcosms/' + str(microcosm_id))
+    def setUp(self):
+        self.selenium = webdriver.Firefox()
+        self.live_server_url = config.SERVER_URL
+        CommonActions.login(self.live_server_url, self.selenium)
 
-        # Click through to item creation page
-        WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'create_item'))).click()
+    def tearDown(self):
+        self.selenium.close()
 
-        # Click to load event creation form
+    def test_create_event(self):
+
+        CommonActions.create_microcosm(
+            self.live_server_url,
+            self.selenium,
+            'Microcosm for test event',
+            'Just a test'
+        )
+
+        event_title = 'Test event'
+
+        CommonActions.create_event(
+            self.selenium,
+            self.live_server_url,
+            event_title,
+            'London, UK'
+        )
+
+        title = WebDriverWait(self.selenium, 5).until(
+            EC.element_to_be_clickable((By.ID, 'conversation_title')))
+        assert title.text == event_title
+
+    def test_edit_event(self):
+
+        CommonActions.create_microcosm(
+            self.live_server_url,
+            self.selenium,
+            'Microcosm for edited test event',
+            'Just a test'
+        )
+
+        CommonActions.create_event(
+            self.selenium,
+            self.live_server_url,
+            'Test event',
+            'London, UK'
+        )
+
         WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'create_event'))).click()
+            EC.element_to_be_clickable((By.ID, 'edit_event'))).click()
 
         title = WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'id_title')))
-        title.send_keys('Selenium test event')
+        title.send_keys(' edited')
 
-        where = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_where')))
-        where.send_keys('London, UK')
-
-        # Click 'locate' to geolocate on the map
-        WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'locate'))).click()
+        edit_reason = WebDriverWait(self.selenium, 5).until(
+            EC.element_to_be_clickable((By.ID, 'id_editReason')))
+        edit_reason.send_keys('Selenium update')
 
         WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'submit'))).click()
+
+        edited_title = WebDriverWait(self.selenium, 5).until(
+            EC.element_to_be_clickable((By.ID, 'event_title')))
+
+        assert edited_title.text.endswith('edited')
 
 
 class CommentIntegration(unittest.TestCase):
