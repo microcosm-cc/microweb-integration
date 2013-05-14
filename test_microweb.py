@@ -320,13 +320,12 @@ class EventIntegration(unittest.TestCase):
 
         CommonActions.create_event(
             self.selenium,
-            self.live_server_url,
             event_title,
             'London, UK'
         )
 
         title = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'conversation_title')))
+            EC.element_to_be_clickable((By.ID, 'event_title')))
         assert title.text == event_title
 
     def test_edit_event(self):
@@ -340,7 +339,6 @@ class EventIntegration(unittest.TestCase):
 
         CommonActions.create_event(
             self.selenium,
-            self.live_server_url,
             'Test event',
             'London, UK'
         )
