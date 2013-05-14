@@ -174,7 +174,10 @@ class LoginIntegration(unittest.TestCase):
             EC.element_to_be_clickable((By.ID, 'profile_name'))).click()
 
         WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_profileName'))).send_keys('_edit')
+            EC.element_to_be_clickable((By.ID, 'id_profileName'))).clear()
+
+        WebDriverWait(self.selenium, 5).until(
+            EC.element_to_be_clickable((By.ID, 'id_profileName'))).send_keys('persona_edit')
 
         WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'submit'))).click()
