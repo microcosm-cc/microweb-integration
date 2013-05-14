@@ -116,7 +116,7 @@ class CommonActions():
         WebDriverWait(webdriver, 5).until(
             EC.element_to_be_clickable((By.ID, 'id_where'))).send_keys(location_string)
 
-        # Click 'locate' to geolocate on the map
+        # Click 'locate' to geocode the location string and drop map marker
         WebDriverWait(webdriver, 5).until(
             EC.element_to_be_clickable((By.ID, 'locate'))).click()
 
