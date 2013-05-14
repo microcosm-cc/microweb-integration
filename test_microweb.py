@@ -120,8 +120,26 @@ class CommonActions():
         WebDriverWait(webdriver, 5).until(
             EC.element_to_be_clickable((By.ID, 'locate'))).click()
 
-        WebDriverWait(webdriver, 5).until(
-            EC.element_to_be_clickable((By.ID, 'submit'))).click()
+        # Need to wait until saveLocationState() is finished
+        # otherwise form validation will fail
+        # TODO: replace this with something that detects when
+        # id_lat and id_lon have been populated
+        import time; time.sleep(5)
+
+        submit = WebDriverWait(webdriver, 10).until(
+            EC.element_to_be_clickable((By.ID, 'submit')))
+        submit.click()
+
+    @staticmethod
+    def create_comment(webdriver, content):
+        """
+        Prerequisite: must be viewing an item with a comment box.
+        """
+
+        comment_box = WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.ID, 'id_markdown')))
+        comment_box.send_keys(content)
+        webdriver.find_element_by_id('submit_comment').click()
 
 
 class LoginIntegration(unittest.TestCase):
