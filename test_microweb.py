@@ -386,26 +386,54 @@ class EventIntegration(unittest.TestCase):
 
 class CommentIntegration(unittest.TestCase):
 
-    def create_comment_on_item(self, item_path, item_id):
+    content = \
+        """
+        A test comment with *markdown*,
+        line breaks, [links](http://example.org), another link
+        http://example.org, a mention +motter, and a
+        <script>small html forbidden fruit</script>.
+        """
 
-        item_url = self.live_server_url + '/' + item_path + '/' + str(item_id) + '/'
-        self.selenium.get(item_url)
+    def setUp(self):
+        self.selenium = webdriver.Firefox()
+        self.live_server_url = config.SERVER_URL
+        CommonActions.login(self.live_server_url, self.selenium)
 
-        markdown = 'A test comment with *markdown*\n \
-            , line breaks, and [links](http://example.org).'
+    def tearDown(self):
+        self.selenium.close()
 
-        comment_box = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_markdown')))
-        comment_box.send_keys(markdown)
-        self.selenium.find_element_by_id('submit_comment').click()
+    def test_comment_on_event(self):
 
-    def edit_comment(self, comment_id):
-        self.selenium.get(self.live_server_url + '/comments/' + str(comment_id))
+        CommonActions.create_microcosm(
+            self.live_server_url,
+            self.selenium,
+            'Microcosm for edited test event',
+            'Just a test'
+        )
 
-        comment_box = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_markdown')))
-        comment_box.send_keys(' edited')
-        self.selenium.find_element_by_id('submit_comment').click()
+        CommonActions.create_event(
+            self.selenium,
+            'Test event',
+            'London, UK'
+        )
+
+        CommonActions.create_comment(self.selenium, CommentIntegration.content)
+
+    def test_comment_on_conversation(self):
+
+        CommonActions.create_microcosm(
+            self.live_server_url,
+            self.selenium,
+            'Microcosm for edited test event',
+            'Just a test'
+        )
+
+        CommonActions.create_conversation(
+            self.selenium,
+            'Test conversation',
+        )
+
+        CommonActions.create_comment(self.selenium, CommentIntegration.content)
 
 
 if __name__ == "__main__":
