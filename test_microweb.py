@@ -27,14 +27,14 @@ class CommonActions():
         email_address_input = WebDriverWait(webdriver, 5).until(
             EC.element_to_be_clickable((By.XPATH, '//*[@id="authentication_email"]')))
         email_address_input.send_keys(config.PERSONA_USER)
-        webdriver.find_element_by_xpath('//*[@id="authentication_form"]/p[3]/button[1]').click()
+        webdriver.find_element_by_xpath('//*[@id="authentication_form"]/p[4]/button[1]').click()
 
         password_input = WebDriverWait(webdriver, 5).until(
             EC.element_to_be_clickable((By.XPATH, '//*[@id="authentication_password"]')))
         password_input.send_keys(config.PERSONA_PASS)
 
         # Submit login form and switch back to previous window
-        webdriver.find_element_by_xpath('//*[@id="authentication_form"]/p[3]/button[2]').click()
+        webdriver.find_element_by_xpath('//*[@id="authentication_form"]/p[4]/button[3]').click()
         webdriver.switch_to_window('')
 
         # Wait until profile name is clickable
