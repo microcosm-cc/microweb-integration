@@ -1,8 +1,10 @@
 import unittest
 import config
+import re
+
+from urlparse import urlparse
 
 from selenium import webdriver
-
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -140,6 +142,12 @@ class CommonActions():
             EC.element_to_be_clickable((By.ID, 'id_markdown')))
         comment_box.send_keys(content)
         webdriver.find_element_by_id('submit_comment').click()
+
+    @staticmethod
+    def delete_comment(webdriver, comment_id):
+
+        delete_element_id = 'comment%sdelete' % comment_id
+        webdriver.find_element_by_id(delete_element_id).click()
 
 
 class LoginIntegration(unittest.TestCase):
@@ -394,6 +402,15 @@ class CommentIntegration(unittest.TestCase):
         <script>small html forbidden fruit</script>.
         """
 
+    def get_created_comment_id(self):
+        """
+        Parses the ID of the comment that's been created out of the current URL.
+        """
+
+        id_match = re.compile('(\D+)(\d+)')
+        fragment = urlparse(self.selenium.current_url).fragment
+        return id_match.match(fragment).groups()[1]
+
     def setUp(self):
         self.selenium = webdriver.Firefox()
         self.live_server_url = config.SERVER_URL
@@ -419,6 +436,26 @@ class CommentIntegration(unittest.TestCase):
 
         CommonActions.create_comment(self.selenium, CommentIntegration.content)
 
+    def test_delete_comment_on_event(self):
+
+        CommonActions.create_microcosm(
+            self.live_server_url,
+            self.selenium,
+            'Microcosm for edited test event',
+            'Just a test'
+        )
+
+        CommonActions.create_event(
+            self.selenium,
+            'Test event',
+            'London, UK'
+        )
+
+        CommonActions.create_comment(self.selenium, CommentIntegration.content)
+
+        comment_id = self.get_created_comment_id()
+        CommonActions.delete_comment(self.selenium, comment_id)
+
     def test_comment_on_conversation(self):
 
         CommonActions.create_microcosm(
@@ -434,6 +471,25 @@ class CommentIntegration(unittest.TestCase):
         )
 
         CommonActions.create_comment(self.selenium, CommentIntegration.content)
+
+    def test_delete_comment_on_conversation(self):
+
+        CommonActions.create_microcosm(
+            self.live_server_url,
+            self.selenium,
+            'Microcosm for edited test event',
+            'Just a test'
+        )
+
+        CommonActions.create_conversation(
+            self.selenium,
+            'Test conversation',
+        )
+
+        CommonActions.create_comment(self.selenium, CommentIntegration.content)
+
+        comment_id = self.get_created_comment_id()
+        CommonActions.delete_comment(self.selenium, comment_id)
 
 
 if __name__ == "__main__":
