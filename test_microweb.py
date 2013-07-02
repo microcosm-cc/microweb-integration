@@ -419,7 +419,7 @@ class CommentIntegration(unittest.TestCase):
     def tearDown(self):
         self.selenium.close()
 
-    def test_comment_on_event(self):
+    def test_create_comment_on_event(self):
 
         CommonActions.create_microcosm(
             self.live_server_url,
@@ -456,7 +456,7 @@ class CommentIntegration(unittest.TestCase):
         comment_id = self.get_created_comment_id()
         CommonActions.delete_comment(self.selenium, comment_id)
 
-    def test_comment_on_conversation(self):
+    def test_create_comment_on_conversation(self):
 
         CommonActions.create_microcosm(
             self.live_server_url,
