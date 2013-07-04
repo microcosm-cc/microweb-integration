@@ -31,7 +31,7 @@ class CommonActions():
         email_address_input.send_keys(config.PERSONA_USER)
         webdriver.find_element_by_xpath('//*[@id="authentication_form"]/p[4]/button[1]').click()
 
-        password_input = WebDriverWait(webdriver, 5).until(
+        password_input = WebDriverWait(webdriver, 10).until(
             EC.element_to_be_clickable((By.XPATH, '//*[@id="authentication_password"]')))
         password_input.send_keys(config.PERSONA_PASS)
 
@@ -261,6 +261,20 @@ class MicrocosmIntegration(unittest.TestCase):
             EC.element_to_be_clickable((By.ID, 'microcosm_title')))
         assert title.text.endswith('edited')
 
+    def test_delete_microcosm(self):
+
+        title = 'Test microcosm'
+        description = 'Created by selenium'
+        CommonActions.create_microcosm(
+            self.live_server_url,
+            self.selenium,
+            title,
+            description
+        )
+
+        WebDriverWait(self.selenium, 5).until(
+            EC.element_to_be_clickable((By.ID, 'edit_microcosm'))).click()
+
 
 class ConversationIntegration(unittest.TestCase):
 
@@ -324,6 +338,28 @@ class ConversationIntegration(unittest.TestCase):
             EC.element_to_be_clickable((By.ID, 'conversation_title')))
 
         assert edited_title.text.endswith('edited')
+
+    def test_delete_conversation(self):
+
+        CommonActions.create_microcosm(
+            self.live_server_url,
+            self.selenium,
+            'Microcosm for test conversation',
+            'Just a test'
+        )
+
+        conversation_title = 'Conversation test'
+
+        CommonActions.create_conversation(
+            self.selenium,
+            conversation_title
+        )
+
+        WebDriverWait(self.selenium, 5).until(
+            EC.element_to_be_clickable((By.ID, 'conversation_title'))).click()
+
+        WebDriverWait(self.selenium, 5).until(
+            EC.element_to_be_clickable((By.ID, 'delete-conversation'))).click()
 
 
 class EventIntegration(unittest.TestCase):
@@ -391,12 +427,34 @@ class EventIntegration(unittest.TestCase):
 
         assert edited_title.text.endswith('edited')
 
+    def test_delete_event(self):
+
+        CommonActions.create_microcosm(
+            self.live_server_url,
+            self.selenium,
+            'Microcosm for test event',
+            'Just a test'
+        )
+
+        event_title = 'Test event'
+
+        CommonActions.create_event(
+            self.selenium,
+            event_title,
+            'London, UK'
+        )
+
+        WebDriverWait(self.selenium, 5).until(
+            EC.element_to_be_clickable((By.ID, 'event_title'))).click()
+
+        WebDriverWait(self.selenium, 5).until(
+            EC.element_to_be_clickable((By.ID, 'delete-event'))).click()
+
 
 class CommentIntegration(unittest.TestCase):
 
     content = \
-        """
-        A test comment with *markdown*,
+        """A test comment with *markdown*,
         line breaks, [links](http://example.org), another link
         http://example.org, a mention +motter, and a
         <script>small html forbidden fruit</script>.
