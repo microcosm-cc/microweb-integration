@@ -148,6 +148,8 @@ class CommonActions():
 
         delete_element_id = 'comment%sdelete' % comment_id
         webdriver.find_element_by_id(delete_element_id).click()
+        webdriver.switch_to_alert().accept()
+        webdriver.switch_to_window('')
 
 
 class LoginIntegration(unittest.TestCase):
@@ -189,10 +191,6 @@ class LoginIntegration(unittest.TestCase):
 
         WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'submit'))).click()
-
-        profile_name = WebDriverWait(self.selenium, 10).until(
-            EC.element_to_be_clickable((By.ID, 'profile_name')))
-        assert profile_name.text.endswith('_edit')
 
     def test_logout(self):
 
@@ -273,7 +271,9 @@ class MicrocosmIntegration(unittest.TestCase):
         )
 
         WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'edit_microcosm'))).click()
+            EC.element_to_be_clickable((By.ID, 'delete-microcosm'))).click()
+        webdriver.switch_to_alert().accept()
+        webdriver.switch_to_window('')
 
 
 class ConversationIntegration(unittest.TestCase):
@@ -360,6 +360,8 @@ class ConversationIntegration(unittest.TestCase):
 
         WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'delete-conversation'))).click()
+        webdriver.switch_to_alert().accept()
+        webdriver.switch_to_window('')
 
 
 class EventIntegration(unittest.TestCase):
@@ -449,6 +451,8 @@ class EventIntegration(unittest.TestCase):
 
         WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'delete-event'))).click()
+        webdriver.switch_to_alert().accept()
+        webdriver.switch_to_window('')
 
 
 class CommentIntegration(unittest.TestCase):
