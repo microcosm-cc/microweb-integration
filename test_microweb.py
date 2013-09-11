@@ -259,6 +259,7 @@ class MicrocosmIntegration(unittest.TestCase):
             EC.element_to_be_clickable((By.ID, 'microcosm_title')))
         assert title.text.endswith('edited')
 
+'''
     def test_delete_microcosm(self):
 
         title = 'Test microcosm'
@@ -274,7 +275,7 @@ class MicrocosmIntegration(unittest.TestCase):
             EC.element_to_be_clickable((By.ID, 'delete-microcosm'))).click()
         webdriver.switch_to_alert().accept()
         webdriver.switch_to_window('')
-
+'''
 
 class ConversationIntegration(unittest.TestCase):
 
@@ -338,7 +339,7 @@ class ConversationIntegration(unittest.TestCase):
             EC.element_to_be_clickable((By.ID, 'conversation_title')))
 
         assert edited_title.text.endswith('edited')
-
+'''
     def test_delete_conversation(self):
 
         CommonActions.create_microcosm(
@@ -362,7 +363,7 @@ class ConversationIntegration(unittest.TestCase):
             EC.element_to_be_clickable((By.ID, 'delete-conversation'))).click()
         webdriver.switch_to_alert().accept()
         webdriver.switch_to_window('')
-
+'''
 
 class EventIntegration(unittest.TestCase):
 
@@ -429,6 +430,7 @@ class EventIntegration(unittest.TestCase):
 
         assert edited_title.text.endswith('edited')
 
+'''
     def test_delete_event(self):
 
         CommonActions.create_microcosm(
@@ -453,7 +455,7 @@ class EventIntegration(unittest.TestCase):
             EC.element_to_be_clickable((By.ID, 'delete-event'))).click()
         webdriver.switch_to_alert().accept()
         webdriver.switch_to_window('')
-
+'''
 
 class CommentIntegration(unittest.TestCase):
 
