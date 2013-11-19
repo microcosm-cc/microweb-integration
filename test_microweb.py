@@ -151,6 +151,19 @@ class CommonActions():
         webdriver.switch_to_alert().accept()
         webdriver.switch_to_window('')
 
+    @staticmethod
+    def create_comment_reply(webdriver, content, comment_id):
+        """
+        Prerequisite: must be viewing an item with the comment with comment_id on the page.
+        """
+        WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.ID, 'comment' + comment_id + 'reply'))).click()
+        comment_box = WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.ID, 'id_markdown')))
+        comment_box.send_keys(content)
+        webdriver.find_element_by_id('submit_comment').click()
+
+
 class LoginIntegration(unittest.TestCase):
 
     def setUp(self):
@@ -474,6 +487,14 @@ class CommentIntegration(unittest.TestCase):
         fragment = urlparse(self.selenium.current_url).fragment
         return id_match.match(fragment).groups()[1]
 
+    def check_hierarchy(self, parents, children):
+        for id in parents:
+            self.selenium.find_elements_by_id('comment' + str(id))
+
+        for id in children:
+            self.selenium.find_elements_by_id('comment' + str(id))
+
+
     def setUp(self):
         self.selenium = webdriver.Firefox()
         self.live_server_url = config.SERVER_URL
@@ -481,6 +502,9 @@ class CommentIntegration(unittest.TestCase):
 
     def tearDown(self):
         self.selenium.close()
+
+    def get_comment_page(self, comment_id):
+        self.selenium.get(config.SERVER_URL + '/comments/' + str(comment_id))
 
     def test_create_comment_on_event(self):
 
@@ -553,6 +577,80 @@ class CommentIntegration(unittest.TestCase):
 
         comment_id = self.get_created_comment_id()
         CommonActions.delete_comment(self.selenium, comment_id)
+
+    def test_create_comment_hierarchy(self):
+
+        CommonActions.create_microcosm(
+            self.live_server_url,
+            self.selenium,
+            'Microcosm for testing comment hierarchy',
+            'Just a test'
+        )
+
+        CommonActions.create_conversation(
+            self.selenium,
+            'Test conversation',
+        )
+
+        CommonActions.create_comment(self.selenium, CommentIntegration.content)
+        parent_id = self.get_created_comment_id()
+
+        CommonActions.create_comment_reply(
+            self.selenium,
+            'Replying to ' + str(parent_id),
+            parent_id
+        )
+        child1_id = self.get_created_comment_id()
+
+        CommonActions.create_comment_reply(
+            self.selenium,
+            'Another reply to ' + str(parent_id),
+            parent_id
+        )
+
+        child2_id = self.get_created_comment_id()
+        CommonActions.create_comment_reply(
+            self.selenium,
+            'Replying to ' + str(child2_id),
+            child2_id
+        )
+        gchild_id = self.get_created_comment_id()
+
+        CommonActions.create_comment_reply(
+            self.selenium,
+            'Replying to ' + str(gchild_id),
+            gchild_id
+        )
+        ggchild1_id = self.get_created_comment_id()
+
+        CommonActions.create_comment_reply(
+            self.selenium,
+            'Another reply to ' + str(gchild_id),
+            gchild_id
+        )
+        ggchild2_id = self.get_created_comment_id()
+        
+        CommonActions.create_comment_reply(
+            self.selenium,
+            'A third reply to ' + str(gchild_id),
+            gchild_id
+        )
+        ggchild3_id = self.get_created_comment_id()
+        
+        self.get_comment_page(parent_id)
+        self.check_hierarchy([],[child1_id, child2_id])
+
+        self.get_comment_page(child1_id)
+        self.check_hierarchy([parent_id], [])
+
+        self.get_comment_page(child2_id)
+        self.check_hierarchy([parent_id], [gchild_id])
+
+        self.get_comment_page(gchild_id)
+        self.check_hierarchy([parent_id, child2_id], [ggchild1_id, ggchild2_id, ggchild3_id])
+
+        self.get_comment_page(ggchild1_id)
+        self.check_hierarchy([parent_id, child2_id, gchild_id], [])
 
 class Profiles(unittest.TestCase):
 
