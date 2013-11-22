@@ -81,10 +81,6 @@ class CommonActions():
         Prerequisite: must be viewing a microcosm and have create permission.
         """
 
-        # Click through to item creation page
-        WebDriverWait(webdriver, 5).until(
-            EC.element_to_be_clickable((By.ID, 'create_item'))).click()
-
         # Click through to create conversation form
         WebDriverWait(webdriver, 5).until(
             EC.element_to_be_clickable((By.ID, 'create_conversation'))).click()
@@ -103,10 +99,6 @@ class CommonActions():
         """
         Prerequisite: must be viewing a microcosm and have create permission.
         """
-
-        # Click through to item creation page
-        WebDriverWait(webdriver, 5).until(
-            EC.element_to_be_clickable((By.ID, 'create_item'))).click()
 
         # Click to load event creation form
         WebDriverWait(webdriver, 5).until(
@@ -671,7 +663,7 @@ class Profiles(unittest.TestCase):
         )
 
         WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.XPATH, "//section[@id='sidebar']/p/a"))).click()
+            EC.element_to_be_clickable((By.ID, 'created_by'))).click()
 
         WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.LINK_TEXT, "Profiles"))).click()
