@@ -48,9 +48,7 @@ class CommonActions():
 
         webdriver.get(server_url)
         WebDriverWait(webdriver, 10).until(
-            EC.element_to_be_clickable((By.ID, 'logout'))).click()
-        WebDriverWait(webdriver, 5).until(
-            EC.element_to_be_clickable((By.ID, 'home'))).click()
+            EC.element_to_be_clickable((By.ID, 'signout-form'))).click()
 
     @staticmethod
     def create_microcosm(server_url, webdriver, title, description):
@@ -184,14 +182,19 @@ class LoginIntegration(unittest.TestCase):
 
         CommonActions.login(self.live_server_url, self.selenium)
 
+		# Navigate to profile page
         WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'profile_name'))).click()
 
+		# Click "edit profile"
         WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_profileName'))).clear()
+            EC.element_to_be_clickable((By.ID, 'edit_profile'))).click()
 
         WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_profileName'))).send_keys('persona_edit')
+            EC.element_to_be_clickable((By.ID, 'edit_profile_name'))).clear()
+
+        WebDriverWait(self.selenium, 5).until(
+            EC.element_to_be_clickable((By.ID, 'edit_profile_name'))).send_keys('persona_edit')
 
         WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'submit'))).click()
