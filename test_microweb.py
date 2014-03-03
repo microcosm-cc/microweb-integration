@@ -249,11 +249,11 @@ class MicrocosmIntegration(unittest.TestCase):
             EC.element_to_be_clickable((By.ID, 'edit_microcosm'))).click()
 
         title = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_title')))
+            EC.element_to_be_clickable((By.ID, 'title')))
         title.send_keys(' edited')
 
         edit_reason = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_editReason')))
+            EC.element_to_be_clickable((By.ID, 'editReason')))
         edit_reason.send_keys('Selenium update')
 
         WebDriverWait(self.selenium, 5).until(
