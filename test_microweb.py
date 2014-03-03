@@ -22,7 +22,7 @@ class CommonActions():
         webdriver.get(server_url)
 
         # Click login link, switch to persona window
-        webdriver.find_element_by_id('login_link').click()
+        webdriver.find_element_by_id('login').click()
         webdriver.switch_to_window('__persona_dialog')
 
         # Enter email address and password
@@ -41,14 +41,14 @@ class CommonActions():
 
         # Wait until profile name is clickable
         WebDriverWait(webdriver, 10).until(
-            EC.element_to_be_clickable((By.ID, 'profile_name')))
+            EC.element_to_be_clickable((By.ID, 'profile')))
 
     @staticmethod
     def logout(server_url, webdriver):
 
         webdriver.get(server_url)
         WebDriverWait(webdriver, 10).until(
-            EC.element_to_be_clickable((By.ID, 'signout-form'))).click()
+            EC.element_to_be_clickable((By.ID, 'logout'))).click()
 
     @staticmethod
     def create_microcosm(server_url, webdriver, title, description):
@@ -166,29 +166,29 @@ class LoginIntegration(unittest.TestCase):
     def test_login(self):
         
         CommonActions.login(self.live_server_url, self.selenium)
-        assert self.selenium.find_element_by_id('profile_name').text != ""
+        assert self.selenium.find_element_by_id('profile').text != ""
 
     def test_view_profile(self):
 
         CommonActions.login(self.live_server_url, self.selenium)
 
         WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'profile_name'))).click()
+            EC.element_to_be_clickable((By.ID, 'profile'))).click()
 
         WebDriverWait(self.selenium, 10).until(
-            EC.element_to_be_clickable((By.ID, 'profile_name')))
+            EC.element_to_be_clickable((By.ID, 'profile')))
 
-    def test_edit_profile_name(self):
+    def test_edit_profile(self):
 
         CommonActions.login(self.live_server_url, self.selenium)
 
 		# Navigate to profile page
         WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'profile_name'))).click()
+            EC.element_to_be_clickable((By.ID, 'edit_profile'))).click()
 
 		# Click "edit profile"
         WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'edit_profile'))).click()
+            EC.element_to_be_clickable((By.ID, 'edit_profile_name'))).click()
 
         WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'edit_profile_name'))).clear()
