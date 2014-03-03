@@ -74,7 +74,7 @@ class CommonActions():
             EC.element_to_be_clickable((By.ID, 'microcosm_title')))
 
     @staticmethod
-    def create_conversation(webdriver, title):
+    def create_conversation(webdriver, title, first_post):
         """
         Prerequisite: must be viewing a microcosm and have create permission.
         """
@@ -84,13 +84,16 @@ class CommonActions():
             EC.element_to_be_clickable((By.ID, 'create_conversation'))).click()
 
         WebDriverWait(webdriver, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_title'))).send_keys(title)
+            EC.element_to_be_clickable((By.ID, 'title'))).send_keys(title)
+
+        WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.ID, 'reply-box-textarea'))).send_keys(first_post)
 
         WebDriverWait(webdriver, 5).until(
             EC.element_to_be_clickable((By.ID, 'submit'))).click()
 
         WebDriverWait(webdriver, 5).until(
-            EC.element_to_be_clickable((By.ID, 'conversation_title')))
+            EC.element_to_be_clickable((By.ID, 'title')))
 
     @staticmethod
     def create_event(webdriver, title, location_string):
@@ -303,11 +306,12 @@ class ConversationIntegration(unittest.TestCase):
 
         CommonActions.create_conversation(
             self.selenium,
-            conversation_title
+            conversation_title,
+            'Hi'
         )
 
         title = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'conversation_title')))
+            EC.element_to_be_clickable((By.ID, 'title')))
         assert title.text == conversation_title
 
     def test_edit_conversation(self):
@@ -322,25 +326,26 @@ class ConversationIntegration(unittest.TestCase):
 
         CommonActions.create_conversation(
             self.selenium,
-            conversation_title
+            conversation_title,
+            'Hi'
         )
 
         WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'edit_conversation'))).click()
 
         title = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_title')))
+            EC.element_to_be_clickable((By.ID, 'title')))
         title.send_keys(' edited')
 
         edit_reason = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_editReason')))
+            EC.element_to_be_clickable((By.ID, 'editReason')))
         edit_reason.send_keys('Selenium update')
 
         WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'submit'))).click()
 
         edited_title = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'conversation_title')))
+            EC.element_to_be_clickable((By.ID, 'title')))
 
         assert edited_title.text.endswith('edited')
 '''
