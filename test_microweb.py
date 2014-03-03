@@ -63,10 +63,10 @@ class CommonActions():
         create_microcosm.click()
 
         WebDriverWait(webdriver, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_title'))).send_keys(title)
+            EC.element_to_be_clickable((By.ID, 'title'))).send_keys(title)
 
         WebDriverWait(webdriver, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_description'))).send_keys(description)
+            EC.element_to_be_clickable((By.ID, 'description'))).send_keys(description)
 
         webdriver.find_element_by_id('submit').click()
 
@@ -233,9 +233,6 @@ class MicrocosmIntegration(unittest.TestCase):
         microcosm_title = WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'microcosm_title')))
         assert microcosm_title.text == title
-
-        microcosm_desc = self.selenium.find_element_by_id('microcosm_description')
-        assert microcosm_desc.text == description
 
     def test_edit_microcosm(self):
 
