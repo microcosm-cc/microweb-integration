@@ -96,7 +96,7 @@ class CommonActions():
             EC.element_to_be_clickable((By.ID, 'title')))
 
     @staticmethod
-    def create_event(webdriver, title, location_string):
+    def create_event(webdriver, title, location_string, first_post):
         """
         Prerequisite: must be viewing a microcosm and have create permission.
         """
@@ -106,10 +106,13 @@ class CommonActions():
             EC.element_to_be_clickable((By.ID, 'create_event'))).click()
 
         WebDriverWait(webdriver, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_title'))).send_keys(title)
+            EC.element_to_be_clickable((By.ID, 'title'))).send_keys(title)
 
         WebDriverWait(webdriver, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_where'))).send_keys(location_string)
+            EC.element_to_be_clickable((By.ID, 'location'))).send_keys(location_string)
+
+        WebDriverWait(webdriver, 5).until(
+            EC.element_to_be_clickable((By.ID, 'reply-box-textarea'))).send_keys(first_post)
 
         # Click 'locate' to geocode the location string and drop map marker
         WebDriverWait(webdriver, 5).until(
@@ -266,23 +269,6 @@ class MicrocosmIntegration(unittest.TestCase):
             EC.element_to_be_clickable((By.ID, 'microcosm_title')))
         assert title.text.endswith('edited')
 
-'''
-    def test_delete_microcosm(self):
-
-        title = 'Test microcosm'
-        description = 'Created by selenium'
-        CommonActions.create_microcosm(
-            self.live_server_url,
-            self.selenium,
-            title,
-            description
-        )
-
-        WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'delete-microcosm'))).click()
-        webdriver.switch_to_alert().accept()
-        webdriver.switch_to_window('')
-'''
 
 class ConversationIntegration(unittest.TestCase):
 
@@ -348,31 +334,7 @@ class ConversationIntegration(unittest.TestCase):
             EC.element_to_be_clickable((By.ID, 'title')))
 
         assert edited_title.text.endswith('edited')
-'''
-    def test_delete_conversation(self):
 
-        CommonActions.create_microcosm(
-            self.live_server_url,
-            self.selenium,
-            'Microcosm for test conversation',
-            'Just a test'
-        )
-
-        conversation_title = 'Conversation test'
-
-        CommonActions.create_conversation(
-            self.selenium,
-            conversation_title
-        )
-
-        WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'conversation_title'))).click()
-
-        WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'delete-conversation'))).click()
-        webdriver.switch_to_alert().accept()
-        webdriver.switch_to_window('')
-'''
 
 class EventIntegration(unittest.TestCase):
 
@@ -398,7 +360,8 @@ class EventIntegration(unittest.TestCase):
         CommonActions.create_event(
             self.selenium,
             event_title,
-            'London, UK'
+            'London, UK',
+            'Hi'
         )
 
         title = WebDriverWait(self.selenium, 5).until(
@@ -417,7 +380,8 @@ class EventIntegration(unittest.TestCase):
         CommonActions.create_event(
             self.selenium,
             'Test event',
-            'London, UK'
+            'London, UK',
+            'First comment'
         )
 
         WebDriverWait(self.selenium, 5).until(
@@ -439,32 +403,6 @@ class EventIntegration(unittest.TestCase):
 
         assert edited_title.text.endswith('edited')
 
-'''
-    def test_delete_event(self):
-
-        CommonActions.create_microcosm(
-            self.live_server_url,
-            self.selenium,
-            'Microcosm for test event',
-            'Just a test'
-        )
-
-        event_title = 'Test event'
-
-        CommonActions.create_event(
-            self.selenium,
-            event_title,
-            'London, UK'
-        )
-
-        WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'event_title'))).click()
-
-        WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'delete-event'))).click()
-        webdriver.switch_to_alert().accept()
-        webdriver.switch_to_window('')
-'''
 
 class CommentIntegration(unittest.TestCase):
 
