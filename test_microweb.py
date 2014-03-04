@@ -454,6 +454,7 @@ class CommentIntegration(unittest.TestCase):
             self.selenium,
             'Test event',
             'London, UK'
+            'First comment'
         )
 
         CommonActions.create_comment(self.selenium, CommentIntegration.content)
@@ -471,6 +472,7 @@ class CommentIntegration(unittest.TestCase):
             self.selenium,
             'Test event',
             'London, UK'
+            'First comment'
         )
 
         CommonActions.create_comment(self.selenium, CommentIntegration.content)
@@ -490,6 +492,7 @@ class CommentIntegration(unittest.TestCase):
         CommonActions.create_conversation(
             self.selenium,
             'Test conversation',
+            'First comment'
         )
 
         CommonActions.create_comment(self.selenium, CommentIntegration.content)
@@ -506,6 +509,7 @@ class CommentIntegration(unittest.TestCase):
         CommonActions.create_conversation(
             self.selenium,
             'Test conversation',
+            'First comment'
         )
 
         CommonActions.create_comment(self.selenium, CommentIntegration.content)
@@ -525,6 +529,7 @@ class CommentIntegration(unittest.TestCase):
         CommonActions.create_conversation(
             self.selenium,
             'Test conversation',
+            'First comment'
         )
 
         CommonActions.create_comment(self.selenium, CommentIntegration.content)
