@@ -71,7 +71,7 @@ class CommonActions():
         webdriver.find_element_by_id('submit').click()
 
         WebDriverWait(webdriver, 5).until(
-            EC.element_to_be_clickable((By.ID, 'microcosm_title')))
+            EC.element_to_be_clickable((By.ID, 'title')))
 
     @staticmethod
     def create_conversation(webdriver, title, first_post):
