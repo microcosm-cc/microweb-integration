@@ -317,7 +317,7 @@ class ConversationIntegration(unittest.TestCase):
         )
 
         WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'edit_conversation'))).click()
+            EC.element_to_be_clickable((By.ID, 'edit-conversation'))).click()
 
         title = WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'title')))
