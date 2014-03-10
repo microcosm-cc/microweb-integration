@@ -365,7 +365,7 @@ class EventIntegration(unittest.TestCase):
         )
 
         title = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'event_title')))
+            EC.element_to_be_clickable((By.ID, 'title')))
         assert title.text == event_title
 
     def test_edit_event(self):
@@ -385,21 +385,21 @@ class EventIntegration(unittest.TestCase):
         )
 
         WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'edit_event'))).click()
+            EC.element_to_be_clickable((By.ID, 'edit-event'))).click()
 
         title = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_title')))
+            EC.element_to_be_clickable((By.ID, 'title')))
         title.send_keys(' edited')
 
         edit_reason = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_editReason')))
+            EC.element_to_be_clickable((By.ID, 'editReason')))
         edit_reason.send_keys('Selenium update')
 
         WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'submit'))).click()
 
         edited_title = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'event_title')))
+            EC.element_to_be_clickable((By.ID, 'title')))
 
         assert edited_title.text.endswith('edited')
 
