@@ -237,7 +237,7 @@ class MicrocosmIntegration(unittest.TestCase):
 
         # Depends on being directed to the newly created microcosm
         microcosm_title = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'microcosm_title')))
+            EC.element_to_be_clickable((By.ID, 'title')))
         assert microcosm_title.text == title
 
     def test_edit_microcosm(self):
@@ -252,7 +252,7 @@ class MicrocosmIntegration(unittest.TestCase):
         )
 
         WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'edit_microcosm'))).click()
+            EC.element_to_be_clickable((By.ID, 'edit-microcosm'))).click()
 
         title = WebDriverWait(self.selenium, 5).until(
             EC.element_to_be_clickable((By.ID, 'title')))
@@ -266,7 +266,7 @@ class MicrocosmIntegration(unittest.TestCase):
             EC.element_to_be_clickable((By.ID, 'submit'))).click()
 
         title = WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'microcosm_title')))
+            EC.element_to_be_clickable((By.ID, 'title')))
         assert title.text.endswith('edited')
 
 
