@@ -140,14 +140,6 @@ class CommonActions():
         webdriver.find_element_by_id('submit').click()
 
     @staticmethod
-    def delete_comment(webdriver, comment_id):
-
-        delete_element_id = 'comment%sdelete' % comment_id
-        webdriver.find_element_by_id(delete_element_id).click()
-        webdriver.switch_to_alert().accept()
-        webdriver.switch_to_window('')
-
-    @staticmethod
     def create_comment_reply(webdriver, content, comment_id):
         """
         Prerequisite: must be viewing an item with the comment with comment_id on the page.
@@ -459,27 +451,6 @@ class CommentIntegration(unittest.TestCase):
 
         CommonActions.create_comment(self.selenium, CommentIntegration.content)
 
-    def test_delete_comment_on_event(self):
-
-        CommonActions.create_microcosm(
-            self.live_server_url,
-            self.selenium,
-            'Microcosm for edited test event',
-            'Just a test'
-        )
-
-        CommonActions.create_event(
-            self.selenium,
-            'Test event',
-            'London, UK',
-            'First comment'
-        )
-
-        CommonActions.create_comment(self.selenium, CommentIntegration.content)
-
-        comment_id = self.get_created_comment_id()
-        CommonActions.delete_comment(self.selenium, comment_id)
-
     def test_create_comment_on_conversation(self):
 
         CommonActions.create_microcosm(
@@ -496,26 +467,6 @@ class CommentIntegration(unittest.TestCase):
         )
 
         CommonActions.create_comment(self.selenium, CommentIntegration.content)
-
-    def test_delete_comment_on_conversation(self):
-
-        CommonActions.create_microcosm(
-            self.live_server_url,
-            self.selenium,
-            'Microcosm for edited test event',
-            'Just a test'
-        )
-
-        CommonActions.create_conversation(
-            self.selenium,
-            'Test conversation',
-            'First comment'
-        )
-
-        CommonActions.create_comment(self.selenium, CommentIntegration.content)
-
-        comment_id = self.get_created_comment_id()
-        CommonActions.delete_comment(self.selenium, comment_id)
 
     def test_create_comment_hierarchy(self):
 
