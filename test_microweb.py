@@ -135,9 +135,9 @@ class CommonActions():
         """
 
         comment_box = WebDriverWait(webdriver, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_markdown')))
+            EC.element_to_be_clickable((By.ID, 'reply-box-textarea')))
         comment_box.send_keys(content)
-        webdriver.find_element_by_id('submit_comment').click()
+        webdriver.find_element_by_id('submit').click()
 
     @staticmethod
     def delete_comment(webdriver, comment_id):
@@ -155,9 +155,9 @@ class CommonActions():
         WebDriverWait(webdriver, 5).until(
             EC.element_to_be_clickable((By.ID, 'comment' + comment_id + 'reply'))).click()
         comment_box = WebDriverWait(webdriver, 5).until(
-            EC.element_to_be_clickable((By.ID, 'id_markdown')))
+            EC.element_to_be_clickable((By.ID, 'reply-box-textarea')))
         comment_box.send_keys(content)
-        webdriver.find_element_by_id('submit_comment').click()
+        webdriver.find_element_by_id('submit').click()
 
 
 class LoginIntegration(unittest.TestCase):
