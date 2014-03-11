@@ -453,7 +453,7 @@ class CommentIntegration(unittest.TestCase):
         CommonActions.create_event(
             self.selenium,
             'Test event',
-            'London, UK'
+            'London, UK',
             'First comment'
         )
 
@@ -471,7 +471,7 @@ class CommentIntegration(unittest.TestCase):
         CommonActions.create_event(
             self.selenium,
             'Test event',
-            'London, UK'
+            'London, UK',
             'First comment'
         )
 
