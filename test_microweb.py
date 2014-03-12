@@ -467,44 +467,8 @@ class CommentIntegration(unittest.TestCase):
         )
 
         CommonActions.create_comment(self.selenium, CommentIntegration.content)
-
-
-class Profiles(unittest.TestCase):
-
-    def setUp(self):
-        self.selenium = webdriver.Firefox()
-        self.live_server_url = config.SERVER_URL
-        CommonActions.login(self.live_server_url, self.selenium)
-
-    def tearDown(self):
-        self.selenium.close()
-
-    def test_check_profiles_page_links(self):
-        CommonActions.create_microcosm(
-            self.live_server_url,
-            self.selenium,
-            'Microcosm for edited test event',
-            'Just a test'
-        )
-
-        WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.ID, 'created_by'))).click()
-
-        WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.LINK_TEXT, "Profiles"))).click()
-
-        WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, "Sort"))).click()
-
-        WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, "Sort"))).click()
-
-        WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.LINK_TEXT, "u"))).click()
-
-        WebDriverWait(self.selenium, 5).until(
-            EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, "Sort"))).click()
-
         
+
 if __name__ == "__main__":
     unittest.main()
+
